@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const MONTHS = [
   { value: 1, label: "January" },
@@ -32,6 +32,64 @@ export { PAPER_SIZES };
 export default function ControlPanel({ year, month, onYearChange, onMonthChange, paperSize, onPaperSizeChange }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+
+  const [tideYear, setTideYear] = useState(currentYear);
+  const [tideMonth, setTideMonth] = useState(0);
+  const [tideStatus, setTideStatus] = useState("");
+  const [tideLoading, setTideLoading] = useState(false);
+
+  async function handleFetchTides() {
+    setTideLoading(true);
+    setTideStatus("Fetching...");
+    try {
+      const res = await fetch("/api/fetch-tides", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          year: tideYear,
+          month: tideMonth === 0 ? null : tideMonth,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTideStatus(
+          tideMonth === 0
+            ? `✓ Fetched all 12 months for ${tideYear}`
+            : `✓ Fetched ${MONTHS[tideMonth - 1].label} ${tideYear}`
+        );
+      } else {
+        setTideStatus(`✗ Error: ${data.error}`);
+      }
+    } catch (e) {
+      setTideStatus(`✗ ${e.message}`);
+    }
+    setTideLoading(false);
+  }
+
+  async function handleDeleteTides() {
+    const scope = tideMonth === 0
+      ? `all data for ${tideYear}`
+      : `${MONTHS[tideMonth - 1].label} ${tideYear}`;
+    if (!confirm(`Delete tide data for ${scope}?`)) return;
+
+    setTideLoading(true);
+    setTideStatus("Deleting...");
+    try {
+      const res = await fetch("/api/delete-tides", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          year: tideYear,
+          month: tideMonth === 0 ? null : tideMonth,
+        }),
+      });
+      const data = await res.json();
+      setTideStatus(data.success ? `✓ Deleted ${scope}` : `✗ ${data.error}`);
+    } catch (e) {
+      setTideStatus(`✗ ${e.message}`);
+    }
+    setTideLoading(false);
+  }
 
   const handlePrint = () => {
     const selected = PAPER_SIZES.find((p) => p.value === paperSize) || PAPER_SIZES[0];
@@ -92,6 +150,53 @@ export default function ControlPanel({ year, month, onYearChange, onMonthChange,
       <button className="print-btn" onClick={handlePrint}>
         Print / Export PDF
       </button>
+
+      <div className="tide-manager no-print">
+        <div className="tide-manager-title">Tide Data</div>
+
+        <div className="tide-manager-row">
+          <select
+            value={tideYear}
+            onChange={(e) => setTideYear(Number(e.target.value))}
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+
+          <select
+            value={tideMonth}
+            onChange={(e) => setTideMonth(Number(e.target.value))}
+          >
+            <option value={0}>All Months</option>
+            {MONTHS.map((m) => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="tide-manager-row">
+          <button
+            className="tide-fetch-btn"
+            onClick={handleFetchTides}
+            disabled={tideLoading}
+          >
+            {tideLoading ? "Loading..." : "Fetch Tides"}
+          </button>
+
+          <button
+            className="tide-delete-btn"
+            onClick={handleDeleteTides}
+            disabled={tideLoading}
+          >
+            Delete
+          </button>
+        </div>
+
+        {tideStatus && (
+          <div className="tide-status">{tideStatus}</div>
+        )}
+      </div>
     </div>
   );
 }
