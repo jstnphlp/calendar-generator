@@ -12,6 +12,30 @@ const YEAR_DATA = {
   2027: tides2027,
 };
 
+export async function loadTideDataForYear(year) {
+  if (YEAR_DATA[year]) return true;
+  try {
+    const res = await fetch(`/api/tides/${year}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    YEAR_DATA[year] = data;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function hasYearTideData(year) {
+  const yearData = YEAR_DATA[year];
+  if (!yearData) return false;
+  for (let m = 1; m <= 12; m++) {
+    if (!yearData[String(m)] || Object.keys(yearData[String(m)]).length === 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function getTideData(year, month, day) {
   const yearData = YEAR_DATA[year];
   if (!yearData) return [];

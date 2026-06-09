@@ -27,9 +27,17 @@ const PAPER_SIZES = [
   { value: "xl",      label: "Extra Large (22×34\")",  width: 22,   height: 34,    unit: "in" },
 ];
 
+export function getEffectiveDimensions(paperSizeValue, orientation) {
+  const selected = PAPER_SIZES.find((p) => p.value === paperSizeValue) || PAPER_SIZES[0];
+  if (orientation === "landscape") {
+    return { width: selected.height, height: selected.width };
+  }
+  return { width: selected.width, height: selected.height };
+}
+
 export { PAPER_SIZES };
 
-export default function ControlPanel({ year, month, onYearChange, onMonthChange, paperSize, onPaperSizeChange }) {
+export default function ControlPanel({ year, month, onYearChange, onMonthChange, paperSize, onPaperSizeChange, orientation, onOrientationChange, onSaveYearPdf }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
@@ -92,10 +100,10 @@ export default function ControlPanel({ year, month, onYearChange, onMonthChange,
   }
 
   const handlePrint = () => {
-    const selected = PAPER_SIZES.find((p) => p.value === paperSize) || PAPER_SIZES[0];
+    const dims = getEffectiveDimensions(paperSize, orientation);
     const styleEl = document.createElement("style");
     styleEl.id = "dynamic-page-size";
-    styleEl.innerHTML = `@page { size: ${selected.width}in ${selected.height}in; margin: 0; }`;
+    styleEl.innerHTML = `@page { size: ${dims.width}in ${dims.height}in; margin: 0; }`;
     const existing = document.getElementById("dynamic-page-size");
     if (existing) existing.remove();
     document.head.appendChild(styleEl);
@@ -147,8 +155,24 @@ export default function ControlPanel({ year, month, onYearChange, onMonthChange,
         </select>
       </div>
 
+      <div className="control-group">
+        <label htmlFor="orientation-select">Orient</label>
+        <select
+          id="orientation-select"
+          value={orientation}
+          onChange={(e) => onOrientationChange(e.target.value)}
+        >
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+
       <button className="print-btn" onClick={handlePrint}>
         Print / Export PDF
+      </button>
+
+      <button className="print-btn save-year-btn" onClick={onSaveYearPdf}>
+        Save Year PDF
       </button>
 
       <div className="tide-manager no-print">

@@ -1,3 +1,38 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #737373;
+  --color-border: #e5e5e5;
+  --color-ring: #003399;
+  --color-primary: #003399;
+  --color-primary-foreground: #ffffff;
+  --color-destructive: #cc0000;
+  --color-destructive-foreground: #ffffff;
+  --color-secondary: #f5f5f5;
+  --color-secondary-foreground: #0a0a0a;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #0a0a0a;
+  --color-overlay: rgba(0, 0, 0, 0.8);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --font-sans: "Archivo Narrow", sans-serif;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
+}
+
 @page {
   size: 8.5in 13in;
   margin: 0;
@@ -107,6 +142,14 @@ body {
 
 .print-btn:hover {
   background: #a30000;
+}
+
+.save-year-btn {
+  background: var(--secondary);
+}
+
+.save-year-btn:hover {
+  background: #002277;
 }
 
 /* ── Tide Data Manager ── */
@@ -703,14 +746,38 @@ body {
   padding: 0 0.6vh;
 }
 
+/* ── Year Print Layout ── */
+.year-print-layout {
+  display: block;
+}
+
+.year-print-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.year-print-page .calendar-preview {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  overflow: hidden;
+}
+
+.year-print-page .calendar-page {
+  width: 100%;
+  height: 100%;
+}
+
 /* ── Print Styles ── */
 @media print {
   html, body, #root {
     margin: 0 !important;
     padding: 0 !important;
-    height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    height: auto;
+    overflow: visible;
   }
 
   body {
@@ -737,6 +804,32 @@ body {
   }
 
   .calendar-page {
+    width: 100%;
+    height: 100%;
+  }
+
+  .year-print-layout {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .year-print-page {
+    width: 100% !important;
+    height: 100% !important;
+    page-break-after: always;
+    break-after: page;
+    overflow: hidden;
+  }
+
+  .year-print-page .calendar-preview {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    overflow: hidden;
+  }
+
+  .year-print-page .calendar-page {
     width: 100%;
     height: 100%;
   }
