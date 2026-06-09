@@ -396,23 +396,47 @@ body {
 /* ── Tide Data Rows ── */
 .tide-row {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
+  align-items: flex-start;
   font-family: var(--font-body);
-  font-size: clamp(5px, 0.7vh, 10px);
+  font-size: clamp(5px, 0.65vh, 9px);
   font-weight: 600;
   line-height: 1.1;
-  padding: 0 0.15vh;
+  padding: 0 0.2vh;
   flex-shrink: 0;
-}
-
-.tide-row.high-tide {
+  width: 100%;
   color: var(--secondary);
-  margin-bottom: 0.15vh;
 }
 
-.tide-row.low-tide {
+.tide-row.top-tide {
+  color: var(--secondary);
+}
+
+.tide-row.bottom-tide {
   color: var(--primary);
-  margin-top: 0.15vh;
+}
+
+.tide-val {
+  flex: 1;
+  font-size: clamp(4.5px, 0.62vh, 8.5px);
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.tide-val.left {
+  text-align: left;
+  padding-right: 0.1vh;
+}
+
+.tide-val.right {
+  text-align: right;
+  padding-left: 0.1vh;
+}
+
+.tide-val:empty {
+  visibility: hidden;
 }
 
 /* ── Holiday Label ── */

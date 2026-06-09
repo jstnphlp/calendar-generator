@@ -69,6 +69,23 @@ function parseMonth(html, monthIndex) {
       }
     }
 
+    if (tides.length === 1 || tides.length === 3) {
+      console.warn(`  ⚠ Day ${day}: unusual tide count ${tides.length}, attempting fallback parse`);
+      const fallbackRegex = /(High|Low)[^<]*?(\d{1,2}:\d{2}\s*(?:am|pm))[^<]*?(-?\d+\.?\d*)\s*m/gi;
+      let fbMatch;
+      const existingTimes = new Set(tides.map((t) => t.time));
+      while ((fbMatch = fallbackRegex.exec(row)) !== null) {
+        const type = fbMatch[1].toLowerCase() === "high" ? "HT" : "LT";
+        const time = parseTime12to24(fbMatch[2].trim());
+        const height = fbMatch[3].trim() + "m";
+        if (time && !existingTimes.has(time)) {
+          tides.push({ type, time, height });
+          existingTimes.add(time);
+          console.warn(`    -> Fallback recovered: ${type} ${time} ${height}`);
+        }
+      }
+    }
+
     if (tides.length > 0) {
       tides.sort((a, b) => a.time.localeCompare(b.time));
       monthData[day] = tides;

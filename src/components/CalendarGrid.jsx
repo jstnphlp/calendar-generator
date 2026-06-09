@@ -64,8 +64,14 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
   const lunarDate = getChineseLunarDate(year, month, dayNum);
   const tides = getTideData(year, month, dayNum);
 
-  const highTides = tides.filter((t) => t.type === "HT");
-  const lowTides = tides.filter((t) => t.type === "LT");
+  const sorted = [...tides].sort((a, b) => a.time.localeCompare(b.time));
+  const topTides = sorted.slice(0, Math.ceil(sorted.length / 2));
+  const bottomTides = sorted.slice(Math.ceil(sorted.length / 2));
+  const topSlots = [topTides[0] || null, topTides[1] || null];
+  const bottomSlots = [bottomTides[0] || null, bottomTides[1] || null];
+
+  const formatT = (tide) =>
+    tide ? `${formatTideTime(tide.time)} ${tide.height}` : "";
 
   const cellClasses = [
     "day-cell",
@@ -79,13 +85,10 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
     <div className={cellClasses}>
       {inMonth && (
         <div className="day-cell-inner">
-          <div className="tide-row high-tide">
-            {highTides.length > 0
-              ? highTides.map((t, i) => (
-                  <span key={i}>{formatTideTime(t.time)} {t.height}</span>
-                ))
-              : <span>&nbsp;</span>
-            }
+
+          <div className="tide-row top-tide">
+            <span className="tide-val left">{formatT(topSlots[0])}</span>
+            <span className="tide-val right">{formatT(topSlots[1])}</span>
           </div>
 
           <div className="day-number-area">
@@ -96,14 +99,11 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
             <span className="chinese-numeral">{lunarDate}</span>
           </div>
 
-          <div className="tide-row low-tide">
-            {lowTides.length > 0
-              ? lowTides.map((t, i) => (
-                  <span key={i}>{formatTideTime(t.time)} {t.height}</span>
-                ))
-              : <span>&nbsp;</span>
-            }
+          <div className="tide-row bottom-tide">
+            <span className="tide-val left">{formatT(bottomSlots[0])}</span>
+            <span className="tide-val right">{formatT(bottomSlots[1])}</span>
           </div>
+
         </div>
       )}
     </div>
