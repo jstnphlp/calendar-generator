@@ -390,77 +390,75 @@ body {
   justify-content: space-between;
   height: 100%;
   position: relative;
-  padding: 0.2vh 0.15vh;
+  padding: 0.1vh 0.1vh;
+  box-sizing: border-box;
 }
 
 /* ── Tide Data Rows ── */
 .tide-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   font-family: var(--font-body);
-  font-size: clamp(5px, 0.65vh, 9px);
   font-weight: 600;
-  line-height: 1.1;
-  padding: 0 0.2vh;
+  line-height: 1;
+  padding: 0 0.1vh;
   flex-shrink: 0;
   width: 100%;
-  color: var(--secondary);
+  box-sizing: border-box;
 }
 
 .tide-row.top-tide {
   color: var(--secondary);
+  align-self: flex-start;
 }
 
 .tide-row.bottom-tide {
   color: var(--primary);
+  align-self: flex-end;
 }
 
 .tide-val {
-  flex: 1;
-  font-size: clamp(4.5px, 0.62vh, 8.5px);
+  font-size: clamp(4px, 0.56vh, 7.5px);
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: clip;
   min-width: 0;
+  line-height: 1;
 }
-
-.tide-val.left {
-  text-align: left;
-  padding-right: 0.1vh;
-}
-
-.tide-val.right {
-  text-align: right;
-  padding-left: 0.1vh;
-}
-
-.tide-val:empty {
-  visibility: hidden;
-}
+.tide-val.left  { text-align: left; }
+.tide-val.right { text-align: right; }
+.tide-val:empty { visibility: hidden; }
 
 /* ── Holiday Label ── */
 .holiday-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
   text-align: center;
   font-family: var(--font-body);
-  font-size: clamp(4px, 0.6vh, 8px);
-  font-weight: 700;
+  font-size: clamp(6px, 0.9vh, 13px);
+  font-weight: 900;
   color: var(--primary);
   text-transform: uppercase;
-  line-height: 1;
-  margin-top: 0.1vh;
+  line-height: 1.2;
+  width: 92%;
+  white-space: normal;
+  word-break: break-word;
+  background: white;
+  padding: 0.15vh 0.2vh;
+  pointer-events: none;
 }
 
 /* ── Date Number ── */
 .day-number-area {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   min-height: 0;
-  gap: 0;
 }
 
 .day-number {
@@ -469,6 +467,8 @@ body {
   font-weight: 400;
   line-height: 0.85;
   letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
 }
 
 .day-cell.sunday .day-number {

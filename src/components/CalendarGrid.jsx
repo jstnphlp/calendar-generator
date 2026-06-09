@@ -63,12 +63,11 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
   const holidayName = getHolidayName(year, month, dayNum);
   const lunarDate = getChineseLunarDate(year, month, dayNum);
   const tides = getTideData(year, month, dayNum);
+  const HT = tides.filter(t => t.type === "HT");
+  const LT = tides.filter(t => t.type === "LT");
 
-  const sorted = [...tides].sort((a, b) => a.time.localeCompare(b.time));
-  const topTides = sorted.slice(0, Math.ceil(sorted.length / 2));
-  const bottomTides = sorted.slice(Math.ceil(sorted.length / 2));
-  const topSlots = [topTides[0] || null, topTides[1] || null];
-  const bottomSlots = [bottomTides[0] || null, bottomTides[1] || null];
+  const topSlots = [HT[0] || null, HT[1] || null];
+  const bottomSlots = [LT[0] || null, LT[1] || null];
 
   const formatT = (tide) =>
     tide ? `${formatTideTime(tide.time)} ${tide.height}` : "";
