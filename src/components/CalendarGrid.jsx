@@ -108,10 +108,11 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
 
           <div className="day-number-area">
             <span className="day-number">{dayNum}</span>
+            {holiday && (
+              <span className="holiday-label">{holidayName}</span>
+            )}
             <span className="chinese-numeral">{lunarDate}</span>
           </div>
-
-          {holiday && <div className="holiday-label">{holidayName}</div>}
 
           <div className="tide-row low-tide">
             {lowTides.map((t, i) => (
