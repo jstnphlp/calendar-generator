@@ -1,5 +1,5 @@
 @page {
-  size: A4 portrait;
+  size: 8.5in 13in;
   margin: 0;
 }
 
@@ -109,10 +109,9 @@ body {
   background: #a30000;
 }
 
-/* ── Calendar Preview: proportional A4 wrapper ── */
+/* ── Calendar Preview: proportional wrapper ── */
 .calendar-preview {
   height: 100vh;
-  aspect-ratio: 210 / 297;
   overflow: hidden;
 }
 

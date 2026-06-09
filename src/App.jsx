@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ControlPanel from "./components/ControlPanel";
 import CalendarPreview from "./components/CalendarPreview";
 import useCalendar from "./hooks/useCalendar";
@@ -14,6 +14,8 @@ export default function App() {
     monthName,
   } = useCalendar();
 
+  const [paperSize, setPaperSize] = useState("a4");
+
   return (
     <div className="app">
       <ControlPanel
@@ -21,6 +23,8 @@ export default function App() {
         month={month}
         onYearChange={setYear}
         onMonthChange={setMonth}
+        paperSize={paperSize}
+        onPaperSizeChange={setPaperSize}
       />
       <CalendarPreview
         year={year}
@@ -28,6 +32,7 @@ export default function App() {
         monthName={monthName}
         weeks={weeks}
         daysMeta={daysMeta}
+        paperSize={paperSize}
       />
     </div>
   );

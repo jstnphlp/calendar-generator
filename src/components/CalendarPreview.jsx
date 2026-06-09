@@ -5,6 +5,7 @@ import {
 } from "date-fns";
 import CalendarGrid from "./CalendarGrid";
 import { getAllHolidaysForYear } from "../data/philippineHolidays";
+import { PAPER_SIZES } from "./ControlPanel";
 
 function MiniCalendar({ date, label }) {
   const monthStart = startOfMonth(date);
@@ -42,7 +43,7 @@ function MiniCalendar({ date, label }) {
   );
 }
 
-export default function CalendarPreview({ year, month, monthName, weeks, daysMeta }) {
+export default function CalendarPreview({ year, month, monthName, weeks, daysMeta, paperSize }) {
   const prevMonth = subMonths(new Date(year, month - 1), 1);
   const nextMonth = addMonths(new Date(year, month - 1), 1);
 
@@ -52,8 +53,13 @@ export default function CalendarPreview({ year, month, monthName, weeks, daysMet
 
   const pad = (n) => String(n).padStart(2, "0");
 
+  const selectedSize = PAPER_SIZES.find((p) => p.value === paperSize) || PAPER_SIZES[0];
+
   return (
-    <div className="calendar-preview">
+    <div
+      className="calendar-preview"
+      style={{ aspectRatio: `${selectedSize.width} / ${selectedSize.height}` }}
+    >
       <div className="calendar-page">
         {/* Meander border frame */}
         <div className="border-outer" />
