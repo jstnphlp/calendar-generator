@@ -122,12 +122,17 @@ body {
   background: var(--surface);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Meander Border Frame (scales with vh) ── */
 .border-outer {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   border: 0.55vh solid var(--secondary);
   pointer-events: none;
   z-index: 10;
@@ -135,6 +140,9 @@ body {
 .border-inner-white {
   position: absolute;
   inset: 0.55vh;
+  width: calc(100% - 1.1vh);
+  height: calc(100% - 1.1vh);
+  box-sizing: border-box;
   border: 0.19vh solid var(--surface);
   pointer-events: none;
   z-index: 10;
@@ -144,23 +152,9 @@ body {
   inset: 0.74vh;
   pointer-events: none;
   z-index: 0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--secondary) 25%,
-    transparent 25%,
-    transparent 75%,
-    var(--secondary) 75%,
-    var(--secondary)
-  ), repeating-linear-gradient(
-    45deg,
-    var(--secondary) 25%,
-    transparent 25%,
-    transparent 75%,
-    var(--secondary) 75%,
-    var(--secondary)
-  );
-  background-position: 0 0, 10px 10px;
-  background-size: 20px 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='%23fff'/%3E%3Cpath d='M0 0h12v2H2v8H0Zm2 2h8v2H6v4H2Z' fill='%23003399'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 12px 12px;
 }
 .meander-1-fill {
   position: absolute;
@@ -174,23 +168,9 @@ body {
   inset: 2.2vh;
   pointer-events: none;
   z-index: 0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--secondary) 25%,
-    transparent 25%,
-    transparent 75%,
-    var(--secondary) 75%,
-    var(--secondary)
-  ), repeating-linear-gradient(
-    45deg,
-    var(--secondary) 25%,
-    transparent 25%,
-    transparent 75%,
-    var(--secondary) 75%,
-    var(--secondary)
-  );
-  background-position: 0 0, 10px 10px;
-  background-size: 20px 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='%23fff'/%3E%3Cpath d='M0 0h12v2H2v8H0Zm2 2h8v2H6v4H2Z' fill='%23003399'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 12px 12px;
 }
 .meander-2-fill {
   position: absolute;
@@ -214,14 +194,15 @@ body {
   padding: 3.5vh 2.8vh 1vh;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   gap: 0.4vh;
 }
 
 /* ── Ad Space ── */
 .ad-space {
   width: 100%;
-  height: 10%;
+  height: 28%;
   border-bottom: 0.19vh solid var(--secondary);
   display: flex;
   align-items: center;
@@ -245,7 +226,7 @@ body {
   align-items: stretch;
   width: 100%;
   border-bottom: 0.19vh solid var(--secondary);
-  height: 6%;
+  height: 5%;
   flex-shrink: 0;
 }
 
@@ -301,10 +282,8 @@ body {
 .calendar-grid-wrapper {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: auto repeat(6, 1fr);
-  gap: 0.09vh;
-  background: var(--secondary);
-  border: 0.09vh solid var(--secondary);
+  grid-template-rows: auto repeat(var(--week-rows), 1fr);
+  grid-auto-rows: 1fr;
   flex: 1;
   min-height: 0;
 }
@@ -312,6 +291,7 @@ body {
 .weekday-header {
   text-align: center;
   padding: 0.3vh 0;
+  border: 0.09vh solid var(--secondary);
 }
 
 .weekday-header span {
@@ -339,7 +319,9 @@ body {
   justify-content: space-between;
   position: relative;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
+  border: 0.09vh solid var(--secondary);
 }
 
 .day-cell-inner {
@@ -348,6 +330,7 @@ body {
   justify-content: space-between;
   height: 100%;
   position: relative;
+  padding: 0.2vh 0.15vh;
 }
 
 /* ── Tide Data Rows ── */
@@ -364,10 +347,12 @@ body {
 
 .tide-row.high-tide {
   color: var(--secondary);
+  margin-bottom: 0.15vh;
 }
 
 .tide-row.low-tide {
   color: var(--primary);
+  margin-top: 0.15vh;
 }
 
 /* ── Holiday Label ── */
@@ -390,11 +375,12 @@ body {
   justify-content: center;
   position: relative;
   min-height: 0;
+  padding: 0.1vh 0;
 }
 
 .day-number {
   font-family: var(--font-display);
-  font-size: clamp(16px, 5.2vh, 72px);
+  font-size: clamp(18px, 6.5vh, 88px);
   font-weight: 400;
   line-height: 0.85;
   letter-spacing: -0.02em;
@@ -420,14 +406,50 @@ body {
   font-family: var(--font-body);
   font-size: clamp(5px, 0.8vh, 11px);
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--primary);
   writing-mode: vertical-rl;
   text-orientation: upright;
   line-height: 1;
 }
 
-.day-cell.sunday .chinese-numeral {
+/* ── Moon Phase Cell (occupies empty slots) ── */
+.moon-phase-cell {
+  justify-content: center;
+  align-items: center;
+}
+
+.moon-phase-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2vh;
+  width: 100%;
+  height: 100%;
+}
+
+.moon-icon {
+  width: clamp(12px, 3.5vh, 45px);
+  height: clamp(12px, 3.5vh, 45px);
+  flex-shrink: 0;
+}
+
+.moon-phase-label {
+  font-family: var(--font-display);
+  font-size: clamp(4px, 0.55vh, 7px);
   color: var(--primary);
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.moon-phase-date {
+  font-family: var(--font-body);
+  font-size: clamp(4px, 0.5vh, 7px);
+  color: var(--primary);
+  text-align: center;
+  line-height: 1;
 }
 
 /* ── Footer Section ── */
@@ -595,19 +617,16 @@ body {
 
 /* ── Print Styles ── */
 @media print {
-  html, body {
-    width: 100%;
-    height: 100%;
+  html, body, #root {
     margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh;
+    width: 100vw;
     overflow: hidden;
-    display: block;
-    background: #ffffff;
   }
 
   body {
-    padding: var(--print-pad);
-    box-sizing: border-box;
-    height: 100vh;
+    background: #ffffff;
   }
 
   .no-print {
@@ -617,13 +636,16 @@ body {
   .app {
     width: 100%;
     height: 100%;
-    display: block;
+    margin: 0;
+    padding: 0;
+    display: flex;
   }
 
   .calendar-preview {
     width: 100%;
     height: 100%;
     aspect-ratio: auto;
+    flex: 1;
   }
 
   .calendar-page {

@@ -8,14 +8,66 @@ const LUNAR_TERMS = [
 ];
 
 const PHASE_SYMBOLS = ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"];
+const LUNAR_CYCLE = 29.53058770576;
+const REF_MOON = new Date(2000, 0, 6, 18, 14);
 
-function getLunarDayApprox(year, month, day) {
+const PHASE_TARGETS = [
+  { phase: "NEW MOON", target: 0.0 },
+  { phase: "FIRST QUARTER", target: 7.38 },
+  { phase: "FULL MOON", target: 14.77 },
+  { phase: "LAST QUARTER", target: 22.15 },
+];
+
+function getCyclePosition(year, month, day) {
   const date = new Date(year, month - 1, day);
-  const referenceNewMoon = new Date(2000, 0, 6, 18, 14);
-  const lunarCycle = 29.53058770576;
-  const daysSinceRef = (date - referenceNewMoon) / (1000 * 60 * 60 * 24);
-  const cyclePosition = ((daysSinceRef % lunarCycle) + lunarCycle) % lunarCycle;
-  return Math.floor(cyclePosition);
+  const daysSinceRef = (date - REF_MOON) / (1000 * 60 * 60 * 24);
+  return ((daysSinceRef % LUNAR_CYCLE) + LUNAR_CYCLE) % LUNAR_CYCLE;
+}
+
+function formatPhaseTime(fractionalDay) {
+  const totalMinutes = fractionalDay * 24 * 60;
+  let h = Math.floor(totalMinutes / 60) % 24;
+  const m = Math.floor(totalMinutes % 60);
+  const period = h >= 12 ? "PM" : "AM";
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+export function getMoonPhasesForMonth(year, month) {
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const results = [];
+
+  for (const { phase, target } of PHASE_TARGETS) {
+    let bestDay = -1;
+    let bestDist = Infinity;
+    let bestPos = 0;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const pos = getCyclePosition(year, month, d);
+      let dist = Math.abs(pos - target);
+      if (dist > LUNAR_CYCLE / 2) dist = LUNAR_CYCLE - dist;
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestDay = d;
+        bestPos = pos;
+      }
+    }
+
+    if (bestDay >= 0 && bestDist < 2.0) {
+      results.push({
+        phase,
+        day: bestDay,
+        time: formatPhaseTime(bestPos),
+      });
+    }
+  }
+
+  return results;
+}
+
+export function getLunarDayApprox(year, month, day) {
+  return Math.floor(getCyclePosition(year, month, day));
 }
 
 export function getLunarPhase(year, month, day) {
@@ -27,14 +79,4 @@ export function getLunarPhase(year, month, day) {
 export function getChineseLunarDate(year, month, day) {
   const lunarDay = getLunarDayApprox(year, month, day);
   return LUNAR_TERMS[lunarDay] || "";
-}
-
-export function isNewMoon(year, month, day) {
-  const lunarDay = getLunarDayApprox(year, month, day);
-  return lunarDay <= 1 || lunarDay >= 28;
-}
-
-export function isFullMoon(year, month, day) {
-  const lunarDay = getLunarDayApprox(year, month, day);
-  return lunarDay >= 13 && lunarDay <= 16;
 }
