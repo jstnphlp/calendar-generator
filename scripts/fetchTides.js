@@ -4,7 +4,7 @@
 // Reference port: Manila (Port of Manila)
 // All times in Philippine Standard Time (UTC+8)
 
-import { writeFileSync, existsSync, readFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -32,33 +32,25 @@ function parseTime12to24(timeStr) {
   return `${String(h).padStart(2, "0")}:${m}`;
 }
 
-function parseHeight(cellText) {
-  const match = cellText.match(/(-?[\d.]+)\s*m/);
-  if (!match) return null;
-  return `${match[1]}m`;
-}
-
 function parseMonth(html, monthIndex) {
-  const yearMatch = html.match(/<title>[^|]*\|\s*\w+\s+(\d{4})/);
-  const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
-
-  const rows = [];
-  const trRegex = /<tr>([\s\S]*?)<\/tr>/gi;
-  let trMatch;
-  while ((trMatch = trRegex.exec(html)) !== null) {
-    rows.push(trMatch[1]);
-  }
+  const titleMatch = html.match(/<title>[^<]*?(\d{4})/);
+  const year = titleMatch ? parseInt(titleMatch[1], 10) : new Date().getFullYear() + 1;
 
   const monthData = {};
+  const trRegex = /<tr>([\s\S]*?)<\/tr>/gi;
+  let trMatch;
 
-  for (const row of rows) {
-    const thMatch = row.match(/<th>(\d{1,2})\s/i);
+  while ((trMatch = trRegex.exec(html)) !== null) {
+    const row = trMatch[1];
+
+    const thMatch = row.match(/<th>(\d{1,2})\s/);
     if (!thMatch) continue;
     const day = parseInt(thMatch[1], 10);
 
     const tides = [];
     const tdRegex = /<td>([\s\S]*?)<\/td>/gi;
     let tdMatch;
+
     while ((tdMatch = tdRegex.exec(row)) !== null) {
       const cell = tdMatch[1];
       if (cell.includes("&nbsp;") || !cell.includes("tidal-state")) continue;
@@ -70,7 +62,7 @@ function parseMonth(html, monthIndex) {
       if (stateMatch && timeMatch && heightMatch) {
         const type = stateMatch[1].toLowerCase() === "high" ? "HT" : "LT";
         const time = parseTime12to24(timeMatch[1].trim());
-        const height = parseHeight(heightMatch[1].trim());
+        const height = heightMatch[1].trim().replace(/\s*m$/, "m");
         if (time && height) {
           tides.push({ type, time, height });
         }
@@ -109,7 +101,6 @@ async function fetchMonth(monthIndex) {
 
 async function main() {
   console.log("Fetching Manila tide data from tidetime.org ...\n");
-
   mkdirSync(TIDES_DIR, { recursive: true });
 
   const scraped = {};
@@ -121,32 +112,25 @@ async function main() {
       if (!scraped[year]) scraped[year] = {};
       scraped[year][month] = data;
       const days = Object.keys(data).length;
-      console.log(`  -> ${year}-${String(month).padStart(2,"0")}: ${days} days`);
+      const with4 = Object.values(data).filter((t) => t.length === 4).length;
+      const with2 = Object.values(data).filter((t) => t.length === 2).length;
+      const with3 = Object.values(data).filter((t) => t.length === 3).length;
+      const with1 = Object.values(data).filter((t) => t.length === 1).length;
+      console.log(`  -> ${year}-${String(month).padStart(2, "0")}: ${days} days (4:${with4} 3:${with3} 2:${with2} 1:${with1})`);
     }
     if (i < 11) await sleep(DELAY_MS);
   }
 
   for (const [year, newMonths] of Object.entries(scraped)) {
     const filePath = join(TIDES_DIR, `tides-${year}.json`);
-
-    let existing = {};
-    if (existsSync(filePath)) {
-      try { existing = JSON.parse(readFileSync(filePath, "utf-8")); } catch {}
-    }
-
-    const merged = { ...existing };
-    for (const [month, days] of Object.entries(newMonths)) {
-      merged[month] = days;
-    }
-
-    writeFileSync(filePath, JSON.stringify(merged, null, 2) + "\n");
-    const monthCount = Object.keys(merged).length;
-    const dayCount = Object.values(merged).reduce((s, m) => s + Object.keys(m).length, 0);
+    writeFileSync(filePath, JSON.stringify(newMonths, null, 2) + "\n");
+    const monthCount = Object.keys(newMonths).length;
+    const dayCount = Object.values(newMonths).reduce((s, m) => s + Object.keys(m).length, 0);
     console.log(`\nSaved ${filePath}`);
     console.log(`  ${year}: ${monthCount} months, ${dayCount} days`);
   }
 
-  console.log("\nDone. Per-year files in src/data/tides/");
+  console.log("\nDone.");
 }
 
 main().catch((e) => {

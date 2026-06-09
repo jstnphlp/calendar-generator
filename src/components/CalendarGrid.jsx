@@ -80,9 +80,12 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
       {inMonth && (
         <div className="day-cell-inner">
           <div className="tide-row high-tide">
-            {highTides.map((t, i) => (
-              <span key={i}>{formatTideTime(t.time)} {t.height}</span>
-            ))}
+            {highTides.length > 0
+              ? highTides.map((t, i) => (
+                  <span key={i}>{formatTideTime(t.time)} {t.height}</span>
+                ))
+              : <span>&nbsp;</span>
+            }
           </div>
 
           <div className="day-number-area">
@@ -94,9 +97,12 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
           </div>
 
           <div className="tide-row low-tide">
-            {lowTides.map((t, i) => (
-              <span key={i}>{formatTideTime(t.time)} {t.height}</span>
-            ))}
+            {lowTides.length > 0
+              ? lowTides.map((t, i) => (
+                  <span key={i}>{formatTideTime(t.time)} {t.height}</span>
+                ))
+              : <span>&nbsp;</span>
+            }
           </div>
         </div>
       )}
