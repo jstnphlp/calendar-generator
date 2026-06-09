@@ -2,42 +2,22 @@ import React from "react";
 import { getDay, format } from "date-fns";
 import { isHoliday, getHolidayName } from "../data/philippineHolidays";
 import { getChineseLunarDate, getMoonPhasesForMonth } from "../data/lunarPhases";
-import { getTideData } from "../data/tideData";
+import { getTideData, formatTideTime } from "../data/tideData";
 
 const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 const PHASE_SVGS = {
   "FULL MOON": (
-    <svg className="moon-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="17" fill="#cc0000"/>
-      <circle cx="14" cy="17" r="2.2" fill="white"/>
-      <circle cx="26" cy="17" r="2.2" fill="white"/>
-      <path d="M13 26 Q20 31 27 26" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
+    <img className="moon-icon" src="/full-moon.png" alt="Full Moon" />
   ),
   "LAST QUARTER": (
-    <svg className="moon-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="17" fill="none" stroke="#cc0000" strokeWidth="2"/>
-      <path d="M20 3 A17 17 0 0 0 20 37 Z" fill="#cc0000"/>
-      <circle cx="14" cy="17" r="2.2" fill="white"/>
-      <path d="M13 26 Q20 31 27 26" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
+    <img className="moon-icon" src="/last-quarter.png" alt="Last Quarter" />
   ),
   "NEW MOON": (
-    <svg className="moon-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="17" fill="#cc0000"/>
-      <circle cx="14" cy="17" r="2.2" fill="white"/>
-      <circle cx="26" cy="17" r="2.2" fill="white"/>
-      <path d="M13 26 Q20 31 27 26" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
+    <img className="moon-icon" src="/new-moon.png" alt="New Moon" />
   ),
   "FIRST QUARTER": (
-    <svg className="moon-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="17" fill="none" stroke="#cc0000" strokeWidth="2"/>
-      <path d="M20 3 A17 17 0 0 1 20 37 Z" fill="#cc0000"/>
-      <circle cx="26" cy="17" r="2.2" fill="white"/>
-      <path d="M13 26 Q20 31 27 26" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
+    <img className="moon-icon" src="/first-quarter.png" alt="First Quarter" />
   ),
 };
 
@@ -65,15 +45,14 @@ function assignPhasesToEmptyCells(emptySlots, phases) {
   return assignment;
 }
 
-function MoonPhaseCell({ phase }) {
-  const monthAbbr = format(new Date(2026, 0, 1), "MMM").toUpperCase();
-  const dateStr = `${String(phase.day).padStart(2, "0")}`;
+function MoonPhaseCell({ phase, monthName }) {
+  const dateStr = `${monthName.toUpperCase().slice(0, 3)} ${String(phase.day).padStart(2, "0")} ${phase.time}`;
   return (
     <div className="day-cell moon-phase-cell">
       <div className="moon-phase-content">
         <div className="moon-phase-label">{phase.phase}</div>
         {PHASE_SVGS[phase.phase]}
-        <div className="moon-phase-date">{phase.time}</div>
+        <div className="moon-phase-date">{dateStr}</div>
       </div>
     </div>
   );
@@ -102,7 +81,7 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
         <div className="day-cell-inner">
           <div className="tide-row high-tide">
             {highTides.map((t, i) => (
-              <span key={i}>{t.time} {t.height}</span>
+              <span key={i}>{formatTideTime(t.time)} {t.height}</span>
             ))}
           </div>
 
@@ -116,7 +95,7 @@ function DayCell({ year, month, dayNum, inMonth, isSunday }) {
 
           <div className="tide-row low-tide">
             {lowTides.map((t, i) => (
-              <span key={i}>{t.time} {t.height}</span>
+              <span key={i}>{formatTideTime(t.time)} {t.height}</span>
             ))}
           </div>
         </div>
@@ -129,7 +108,7 @@ function EmptyCell() {
   return <div className="day-cell other-month" />;
 }
 
-export default function CalendarGrid({ year, month, weeks, daysMeta }) {
+export default function CalendarGrid({ year, month, monthName, weeks, daysMeta }) {
   const phases = getMoonPhasesForMonth(year, month);
 
   const emptySlots = [];
@@ -177,7 +156,7 @@ export default function CalendarGrid({ year, month, weeks, daysMeta }) {
       const day = week[di];
       if (!day) {
         if (assignment[idx]) {
-          cells.push(<MoonPhaseCell key={`mp-${idx}`} phase={assignment[idx]} />);
+          cells.push(<MoonPhaseCell key={`mp-${idx}`} phase={assignment[idx]} monthName={monthName} />);
         } else {
           cells.push(<EmptyCell key={`e-${idx}`} />);
         }
@@ -187,7 +166,7 @@ export default function CalendarGrid({ year, month, weeks, daysMeta }) {
       const meta = daysMeta.find((d) => d.date.getTime() === day.getTime());
       if (!meta || !meta.isCurrentMonth) {
         if (assignment[idx]) {
-          cells.push(<MoonPhaseCell key={`mp-${idx}`} phase={assignment[idx]} />);
+          cells.push(<MoonPhaseCell key={`mp-${idx}`} phase={assignment[idx]} monthName={monthName} />);
         } else {
           cells.push(<EmptyCell key={`e-${idx}`} />);
         }

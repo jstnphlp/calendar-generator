@@ -1,36 +1,32 @@
-const TIDE_LABELS = ["LT", "HT", "LT", "HT"];
+// Real tide data for Manila (Port of Manila)
+// Source: tidetime.org — scraped from PAGASA-derived data
+// Run `npm run fetch-tides` to refresh this data
+// Reference port: Manila, Philippines (14°35'N, 120°58'E)
+// All times in Philippine Standard Time (UTC+8)
 
-function getTideDayIndex(year, month, day) {
-  const date = new Date(year, month - 1, day);
-  const epoch = new Date(2024, 0, 1);
-  return Math.floor((date - epoch) / (1000 * 60 * 60 * 24));
-}
+import tides2026 from "./tides/tides-2026.json";
+import tides2027 from "./tides/tides-2027.json";
 
-function seededRandom(seed) {
-  const x = Math.sin(seed * 9301 + 49297) * 49297;
-  return x - Math.floor(x);
-}
+const YEAR_DATA = {
+  2026: tides2026,
+  2027: tides2027,
+};
 
 export function getTideData(year, month, day) {
-  const dayIndex = getTideDayIndex(year, month, day);
-  const baseSeed = dayIndex * 4;
+  const yearData = YEAR_DATA[year];
+  if (!yearData) return [];
+  const tides = yearData[String(month)]?.[String(day)];
+  return tides && tides.length > 0 ? tides : [];
+}
 
-  const tides = [];
-  for (let i = 0; i < 4; i++) {
-    const r = seededRandom(baseSeed + i);
-    const hour = Math.floor(r * 12) + (i < 2 ? 0 : 12);
-    const minute = Math.floor(seededRandom(baseSeed + i + 100) * 60);
-    const height = (seededRandom(baseSeed + i + 200) * 2 + 0.3).toFixed(1);
-    tides.push({
-      type: TIDE_LABELS[i],
-      time: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
-      height: `${height}m`,
-    });
-  }
-  return tides;
+export function formatTideTime(time24) {
+  const [h, m] = time24.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
 }
 
 export function getTideSummary(year, month, day) {
   const tides = getTideData(year, month, day);
-  return tides.map((t) => `${t.time}`).join(" ");
+  return tides.map((t) => formatTideTime(t.time)).join(" ");
 }

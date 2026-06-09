@@ -85,7 +85,7 @@ export default function CalendarPreview({ year, month, monthName, weeks, daysMet
           </div>
 
           {/* Calendar Grid */}
-          <CalendarGrid year={year} month={month} weeks={weeks} daysMeta={daysMeta} />
+          <CalendarGrid year={year} month={month} monthName={monthName} weeks={weeks} daysMeta={daysMeta} />
 
           {/* Footer: Mini Calendars + Holidays */}
           <div className="calendar-footer">
