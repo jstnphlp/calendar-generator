@@ -54,13 +54,14 @@ export default function CalendarPreview({ year, month, monthName, weeks, daysMet
   const pad = (n) => String(n).padStart(2, "0");
 
   const dims = getEffectiveDimensions(paperSize, orientation);
+  const isLandscape = orientation === "landscape";
 
   return (
     <div
       className="calendar-preview"
       style={{ aspectRatio: `${dims.width} / ${dims.height}` }}
     >
-      <div className="calendar-page">
+      <div className={`calendar-page${isLandscape ? " landscape" : ""}`}>
         {/* Meander border frame */}
         <div className="border-outer" />
         <div className="border-inner-white" />

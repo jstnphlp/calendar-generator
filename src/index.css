@@ -746,6 +746,82 @@ body {
   padding: 0 0.6vh;
 }
 
+/* ── Landscape Layout Overrides ── */
+.calendar-page.landscape .calendar-content {
+  padding: 1.8vh 2.8vh 0.6vh;
+  gap: 0.25vh;
+}
+
+.calendar-page.landscape .month-banner {
+  order: 1;
+}
+
+.calendar-page.landscape .calendar-grid-wrapper {
+  order: 2;
+}
+
+.calendar-page.landscape .calendar-footer {
+  order: 3;
+  height: 14%;
+}
+
+.calendar-page.landscape .ad-space {
+  order: 4;
+  height: 8%;
+  border-bottom: none;
+  border-top: 0.19vh solid var(--secondary);
+}
+
+.calendar-page.landscape .disclaimer-bar {
+  order: 5;
+}
+
+.calendar-page.landscape .month-banner-num span,
+.calendar-page.landscape .month-banner-name span,
+.calendar-page.landscape .month-banner-year span {
+  font-size: clamp(14px, 2.5vh, 48px);
+}
+
+.calendar-page.landscape .ad-space span {
+  font-size: clamp(10px, 1.8vh, 32px);
+}
+
+.calendar-page.landscape .day-number {
+  font-size: clamp(18px, 5.5vh, 80px);
+}
+
+.calendar-page.landscape .holiday-label {
+  font-size: clamp(5px, 0.75vh, 11px);
+}
+
+.calendar-page.landscape .chinese-numeral {
+  font-size: clamp(4px, 0.6vh, 9px);
+}
+
+.calendar-page.landscape .mini-cal-header span {
+  font-size: clamp(5px, 0.8vh, 13px);
+}
+
+.calendar-page.landscape .mini-cal-month-label {
+  font-size: clamp(4px, 0.6vh, 10px);
+}
+
+.calendar-page.landscape .mini-cal-weekday {
+  font-size: clamp(3px, 0.45vh, 7px);
+}
+
+.calendar-page.landscape .mini-cal-day {
+  font-size: clamp(4px, 0.6vh, 9px);
+}
+
+.calendar-page.landscape .holidays-header span {
+  font-size: clamp(5px, 0.8vh, 13px);
+}
+
+.calendar-page.landscape .holiday-item {
+  font-size: clamp(4px, 0.6vh, 9px);
+}
+
 /* ── Year Print Layout ── */
 .year-print-layout {
   display: block;
